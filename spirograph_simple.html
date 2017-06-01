@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+ 	<head>
+ 		<meta http-equiv='Content-Type' content='text/html;charset=utf-8'/>
+		<title>Spirograph</title>
+		<script src='https://d3js.org/d3.v4.min.js'></script>
+		<style>
+
+		body {
+			font-family: Verdana, sans-serif;
+			font-size: 8pt;
+			color: #555555;
+			background: #ffffff;
+			margin-left: 20px;
+			margin-top: 20px;
+		}
+
+		.spirograph {
+			fill: none;
+			stroke-width: 1px;
+		}
+		
+		fieldset {
+			border: 1px #333333 solid;
+			width: 360px;
+		}
+
+		</style>
+ 	</head>
+
+ 	<body>
+	A mathematically precise spirograph generator. <br>
+	Choose a radius between (-1 to -0.1) or (0.1 to 1.0) for complete spirals.
+	<p>
+ 	<forms>
+ 	<fieldset>
+ 	<legend>Spirograph</legend>
+ 	radius 1: <input type='text' id='radius1' size='4'>
+ 	radius 2: <input type='text' id='radius2' size='4'>
+ 	ratio: <input type='text' id='ratio' size='4'>
+ 	<button onclick='draw()'>draw</button>
+ 	<button onclick='erase()'>clear</button>
+ 	</fieldset>
+ 	</form>
+
+    <script>
+    	'use strict';
+
+		const margin = {top: 20, right: 20, bottom: 20, left: 20};
+		const width = 600 - margin.left - margin.right;
+		const height = 600 - margin.top - margin.bottom;
+	
+		const line = d3.line()
+				.curve(d3.curveNatural)
+				.x(function(d) { return d.x; })
+				.y(function(d) { return d.y; });
+	
+		const svg = d3.select('body').append('svg')
+			.attr('width', width + margin.left + margin.right)
+			.attr('height', height + margin.top + margin.bottom);
+
+		svg.append('rect')
+		    .attr('width', '100%')
+		    .attr('height', '100%')
+		    .attr('fill', '#ffffff');
+
+		/**
+		 * draw
+		 * Draw a spirograph.
+		 */
+		function draw()
+		{
+			const red = getRandomColour(0.5, 1.0);
+			const green = getRandomColour(0.0, 0.6);
+			const blue = getRandomColour(0.0, 0.6);
+
+			const r1 = document.getElementById('radius1').value;
+			const r2 = document.getElementById('radius2').value;
+			const r = document.getElementById('ratio').value;
+
+			let path = svg.append('path')
+				.attr('class', 'spirograph')
+				.attr('d', line(spirographChart(r1, r2, r)))
+				.style('stroke', d3.rgb(red, green, blue));
+		}
+
+		/**
+		 * erase
+		 * Clear all spirographs.
+		 */
+		function erase()
+		{
+			d3.selectAll('path').remove();
+		}
+
+		/**
+		 * spirographChart
+		 * @param {number} radius outer circle
+		 * @param {number} radius inner circle
+		 * @param {number} ratio.  
+		 * +ve ratio draws outside outer circle.  -ve ratio draws inside outer circle.
+		 * https://en.wikipedia.org/wiki/Spirograph
+		 * https://maissan.net/articles/javascript-spirograph
+		 */
+		function spirographChart(radius1, radius2, ratio)
+		{
+			const cx = width / 2;
+			const cy = height / 2;
+
+			let x = 0;
+			let y = 0;
+			let line_data = [];
+			const revolutions = getRevolutions(radius1, (radius2 * ratio));
+
+			for (let theta = 0; theta <= Math.PI * 2 * revolutions; theta += 0.01) {
+			    x = cx + radius1 * Math.cos(theta) + radius2 * Math.cos(theta * ratio);
+			    y = cy + radius1 * Math.sin(theta) + radius2 * Math.sin(theta * ratio);
+			    line_data.push({x: x, y: y});
+			}
+			return line_data;
+		}
+
+		/**
+		 * getRevolutions
+		 * @param {number} radius outer circle
+		 * @param {number} radius inner circle * ratio
+		 * Calculate least common multiple (LCM) for two numbers.
+		 * The inner disk must do N revolutions to complete the pattern.
+		 * http://www.exo.net/~pauld/activities/spirograph/Spirograph.html
+		 */
+		function getRevolutions(r_outer, r_inner)
+		{
+			let i = 1;
+			let result = false;
+			const circumference_outer = Math.floor(2 * Math.PI * r_outer);
+			const circumference_inner = Math.floor(2 * Math.PI * r_inner);
+			
+			while (!result)
+			{
+				if (((i * circumference_outer) % circumference_inner) !=0)
+				{
+					i = i + 1;
+				}
+				else
+				{
+					result = true;
+				}
+			}
+			if (i > 1000) {
+				// thin out dense spirographs
+				console.log('Thinned out spirograph:', i, r_outer, r_inner);
+				i = Math.floor(i / 10);
+			}	
+			return i;
+		}
+
+		/**
+		 * getRandomColour
+		 * @param {number} minimum value (inclusive)
+		 * @param {number} maximum value (exclusive)
+		 * Return a string RGB value between min and max on the scale (0, 255)
+		 */
+		function getRandomColour(min, max) {
+  			return ((Math.random() * (max - min) + min) * 255).toFixed(2);	
+		}
+		
+	</script>
+  </body>
+</html>
