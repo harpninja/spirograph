@@ -51,7 +51,6 @@
 		const height = 600 - margin.top - margin.bottom;
 	
 		const line = d3.line()
-				.curve(d3.curveNatural)
 				.x(function(d) { return d.x; })
 				.y(function(d) { return d.y; });
 	
@@ -70,9 +69,9 @@
 		 */
 		function draw()
 		{
-			const red = getRandomColour(0.5, 1.0);
-			const green = getRandomColour(0.0, 0.6);
-			const blue = getRandomColour(0.0, 0.6);
+			const red = getRandomColour(0.6, 0.8);
+			const green = getRandomColour(0.2, 0.8);
+			const blue = getRandomColour(0.2, 0.8);
 
 			const r1 = document.getElementById('radius1').value;
 			const r2 = document.getElementById('radius2').value;
