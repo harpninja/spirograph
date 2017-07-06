@@ -25,7 +25,7 @@
 			fill: none;
 			stroke-width: 1.1px;
 		}
-		
+
 		fieldset {
 			border: 1px #333333 solid;
 			width: 420px;
@@ -35,8 +35,9 @@
  	</head>
 
  	<body>
-	A mathematically precise spirograph generator.  <a href='https://github.com/harpninja/spirograph'>Code on GitHub</a>. <br>
-	Choose a radius between (-1 to -0.1) or (0.1 to 1.0) for complete spirals.
+	A mathematically precise spirograph generator.
+  <a href='https://github.com/harpninja/spirograph'>Code on GitHub</a>. <br>
+	Choose a ratio between (-1 to -0.1) or (0.1 to 1.0) for complete spirals.
 	<p>
  	<forms>
  	<fieldset>
@@ -50,16 +51,16 @@
  	</form>
 
     <script>
-    	'use strict';
+    'use strict';
 
 		const margin = {top: 20, right: 20, bottom: 20, left: 20};
 		const width = 600 - margin.left - margin.right;
 		const height = 600 - margin.top - margin.bottom;
-	
+
 		const line = d3.line()
 				.x(function(d) { return d.x; })
 				.y(function(d) { return d.y; });
-	
+
 		const svg = d3.select('body').append('svg')
 			.attr('width', width + margin.left + margin.right)
 			.attr('height', height + margin.top + margin.bottom);
@@ -102,7 +103,7 @@
 		 * spirographChart
 		 * @param {number} radius outer circle
 		 * @param {number} radius inner circle
-		 * @param {number} ratio.  
+		 * @param {number} ratio.
 		 * +ve ratio draws outside outer circle.  -ve ratio draws inside outer circle.
 		 * https://en.wikipedia.org/wiki/Spirograph
 		 * https://maissan.net/articles/javascript-spirograph
@@ -139,7 +140,7 @@
 			let result = false;
 			const circumference_outer = Math.floor(2 * Math.PI * r_outer);
 			const circumference_inner = Math.floor(2 * Math.PI * r_inner);
-			
+
 			while (!result)
 			{
 				if (((i * circumference_outer) % circumference_inner) !=0)
@@ -151,12 +152,12 @@
 					result = true;
 				}
 			}
-			
+
 			if (i > 1000) {
 				// thin out dense spirographs
 				console.log('Thinned out spirograph:', i, r_outer, r_inner);
 				i = Math.floor(i / 10);
-			}	
+			}
 			return i;
 		}
 
@@ -167,9 +168,9 @@
 		 * Return a string RGB value between min and max on the scale (0, 255)
 		 */
 		function getRandomColour(min, max) {
-  			return ((Math.random() * (max - min) + min) * 255).toFixed(2);	
+  			return ((Math.random() * (max - min) + min) * 255).toFixed(2);
 		}
-		
+
 	</script>
   </body>
 </html>
