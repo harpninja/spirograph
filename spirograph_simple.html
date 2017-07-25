@@ -4,6 +4,7 @@
  		<meta http-equiv='Content-Type' content='text/html;charset=utf-8'/>
 		<title>Spirograph</title>
 		<script src='https://d3js.org/d3.v4.min.js'></script>
+		<script src='http://cdnjs.cloudflare.com/ajax/libs/mathjs/3.14.2/math.min.js'></script>
 		<style>
 
 		body {
@@ -36,7 +37,7 @@
 
  	<body>
 	A mathematically precise spirograph generator.
-  <a href='https://github.com/harpninja/spirograph'>Code on GitHub</a>. <br>
+  	<a href='https://github.com/harpninja/spirograph'>Code on GitHub</a>. <br>
 	Choose a ratio between (-1 to -0.1) or (0.1 to 1.0) for complete spirals.
 	<p>
  	<forms>
@@ -116,7 +117,7 @@
 			let x = 0;
 			let y = 0;
 			let line_data = [];
-			const revolutions = getRevolutions(radius1, (radius2 * ratio));
+			const revolutions = getRevolutions(radius1, radius2);
 
 			for (let theta = 0; theta <= Math.PI * 2 * revolutions; theta += 0.01) {
 			    x = cx + radius1 * Math.cos(theta) + radius2 * Math.cos(theta * ratio);
@@ -129,36 +130,27 @@
 		/**
 		 * getRevolutions
 		 * @param {number} radius outer circle
-		 * @param {number} radius inner circle * ratio
+		 * @param {number} radius inner circle
 		 * Calculate least common multiple (LCM) for two numbers.
 		 * The inner disk must do N revolutions to complete the pattern.
 		 * http://www.exo.net/~pauld/activities/spirograph/Spirograph.html
 		 */
 		function getRevolutions(r_outer, r_inner)
 		{
-			let i = 1;
-			let result = false;
-			const circumference_outer = Math.floor(2 * Math.PI * r_outer);
-			const circumference_inner = Math.floor(2 * Math.PI * r_inner);
+			if (r_outer % r_inner == 0)
+				r_outer = r_outer + 1;		// exact multiples don't draw properly
 
-			while (!result)
-			{
-				if (((i * circumference_outer) % circumference_inner) !=0)
-				{
-					i = i + 1;
-				}
-				else
-				{
-					result = true;
-				}
-			}
+			const circumference_outer = Math.round(r_outer);
+			const circumference_inner = Math.round(r_inner);
+ 			let lcm = (circumference_outer * circumference_inner) / math.gcd(circumference_outer, circumference_inner);
+			let revolutions = 0;
 
-			if (i > 1000) {
-				// thin out dense spirographs
-				console.log('Thinned out spirograph:', i, r_outer, r_inner);
-				i = Math.floor(i / 10);
-			}
-			return i;
+			revolutions = lcm / r_inner;
+			if (revolutions < 10)
+				revolutions = lcm;
+		
+			console.log('revolutions=', revolutions);
+			return revolutions;
 		}
 
 		/**
