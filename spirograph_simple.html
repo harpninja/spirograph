@@ -6,7 +6,6 @@
 		<script src='https://d3js.org/d3.v4.min.js'></script>
 		<script src='http://cdnjs.cloudflare.com/ajax/libs/mathjs/3.14.2/math.min.js'></script>
 		<style>
-
 		body {
 			font-family: Verdana, sans-serif;
 			font-size: 8pt;
@@ -24,14 +23,17 @@
 
 		.spirograph {
 			fill: none;
-			stroke-width: 1.1px;
+		}
+
+		.palette-container {
+			vertical-align: text-top;
+			padding-left: 5px;
 		}
 
 		fieldset {
 			border: 1px #333333 solid;
-			width: 420px;
+			width: 800px;
 		}
-
 		</style>
  	</head>
 
@@ -46,30 +48,52 @@
  	radius 1: <input type='text' id='radius1' size='4'>
  	radius 2: <input type='text' id='radius2' size='4'>
  	ratio: <input type='text' id='ratio' size='4'>
+	line width: <input type='text' id='line_width' size='4' value='1.1'>
+	R: <select id='red' onChange='drawPalette()'></select>
+	G: <select id='green' onChange='drawPalette()'></select>
+	B: <select id='blue' onChange='drawPalette()'></select>
+    A: <select id='alpha' onChange='drawPalette()'>
+	   <option value='1'>1</option>
+	   <option value='0.9'>0.9</option>
+	   <option value='0.8'>0.8</option>
+	   <option value='0.7'>0.7</option>
+	   <option value='0.6'>0.6</option>
+	   <option value='0.5'>0.5</option>
+	   <option value='0.4'>0.4</option>
+	   <option value='0.3'>0.3</option>
+	   <option value='0.2'>0.2</option>
+	   <option value='0.1'>0.1</option>
+   </select>
  	<button onclick='draw()'>draw</button>
  	<button onclick='erase()'>clear</button>
+	<svg width='40' height='15' class='palette-container'>
+  		<rect width='40' height='15' id='palette'>
+	</svg>
  	</fieldset>
  	</form>
 
     <script>
-    'use strict';
+    'use strict'
 
-		const margin = {top: 20, right: 20, bottom: 20, left: 20};
-		const width = 600 - margin.left - margin.right;
-		const height = 600 - margin.top - margin.bottom;
+		// spirograph drawing area
+		const margin = {top: 20, right: 20, bottom: 20, left: 20}
+		const width = 600 - margin.left - margin.right
+		const height = 600 - margin.top - margin.bottom
 
 		const line = d3.line()
 				.x(function(d) { return d.x; })
-				.y(function(d) { return d.y; });
+				.y(function(d) { return d.y; })
 
-		const svg = d3.select('body').append('svg')
+		const svg = d3.select('body').append('p').append('svg')
 			.attr('width', width + margin.left + margin.right)
-			.attr('height', height + margin.top + margin.bottom);
+			.attr('height', height + margin.top + margin.bottom)
 
 		svg.append('rect')
 		    .attr('width', '100%')
 		    .attr('height', '100%')
-		    .attr('fill', '#ffffff');
+		    .attr('fill', '#ffffff')
+
+		dropDowns(['red', 'green', 'blue'])
 
 		/**
 		 * draw
@@ -77,18 +101,20 @@
 		 */
 		function draw()
 		{
-			const red = getRandomColour(0.6, 0.8);
-			const green = getRandomColour(0.2, 0.8);
-			const blue = getRandomColour(0.2, 0.8);
-
-			const r1 = document.getElementById('radius1').value;
-			const r2 = document.getElementById('radius2').value;
-			const r = document.getElementById('ratio').value;
+			const red = document.getElementById('red').value
+			const green = document.getElementById('green').value
+			const blue = document.getElementById('blue').value
+			const alpha = document.getElementById('alpha').value
+			const r1 = document.getElementById('radius1').value
+			const r2 = document.getElementById('radius2').value
+			const r = document.getElementById('ratio').value
+			const lw = document.getElementById('line_width').value
 
 			let path = svg.append('path')
 				.attr('class', 'spirograph')
 				.attr('d', line(spirographChart(r1, r2, r)))
-				.style('stroke', d3.rgb(red, green, blue));
+				.style('stroke', d3.rgb(red, green, blue, alpha))
+				.style('stroke-width', lw)
 		}
 
 		/**
@@ -97,7 +123,7 @@
 		 */
 		function erase()
 		{
-			d3.selectAll('path').remove();
+			d3.selectAll('path').remove()
 		}
 
 		/**
@@ -111,18 +137,17 @@
 		 */
 		function spirographChart(radius1, radius2, ratio)
 		{
-			const cx = width / 2;
-			const cy = height / 2;
-
-			let x = 0;
-			let y = 0;
-			let line_data = [];
-			const revolutions = getRevolutions(radius1, radius2);
+			const cx = width / 2
+			const cy = height / 2
+			let x = 0
+			let y = 0
+			let line_data = []
+			const revolutions = getRevolutions(radius1, radius2)
 
 			for (let theta = 0; theta <= Math.PI * 2 * revolutions; theta += 0.01) {
-			    x = cx + radius1 * Math.cos(theta) + radius2 * Math.cos(theta * ratio);
-			    y = cy + radius1 * Math.sin(theta) + radius2 * Math.sin(theta * ratio);
-			    line_data.push({x: x, y: y});
+			    x = cx + radius1 * Math.cos(theta) + radius2 * Math.cos(theta * ratio)
+			    y = cy + radius1 * Math.sin(theta) + radius2 * Math.sin(theta * ratio)
+			    line_data.push({x: x, y: y})
 			}
 			return line_data;
 		}
@@ -138,19 +163,19 @@
 		function getRevolutions(r_outer, r_inner)
 		{
 			if (r_outer % r_inner == 0)
-				r_outer = r_outer + 1;		// exact multiples don't draw properly
+				r_outer = r_outer + 1		// exact multiples don't draw properly
 
-			const circumference_outer = Math.round(r_outer);
-			const circumference_inner = Math.round(r_inner);
- 			let lcm = (circumference_outer * circumference_inner) / math.gcd(circumference_outer, circumference_inner);
-			let revolutions = 0;
+			const circumference_outer = Math.round(r_outer)
+			const circumference_inner = Math.round(r_inner)
+ 			let lcm = (circumference_outer * circumference_inner) / math.gcd(circumference_outer, circumference_inner)
+			let revolutions = 0
 
-			revolutions = lcm / r_inner;
+			revolutions = lcm / r_inner
 			if (revolutions < 10)
-				revolutions = lcm;
-		
-			console.log('revolutions=', revolutions);
-			return revolutions;
+				revolutions = lcm
+
+			console.log('revolutions=', revolutions)
+			return revolutions
 		}
 
 		/**
@@ -160,9 +185,76 @@
 		 * Return a string RGB value between min and max on the scale (0, 255)
 		 */
 		function getRandomColour(min, max) {
-  			return ((Math.random() * (max - min) + min) * 255).toFixed(2);
+  			return ((Math.random() * (max - min) + min) * 255).toFixed(2)
 		}
 
+		/**
+         * dropDowns
+         * @param {string[]} Colours to create drop downs for.
+         */
+        function dropDowns(colours)
+        {
+            for (let c in colours)
+            {
+                const select = document.getElementById(colours[c])
+                let hex = ''
+
+                for (let i = 0; i <= 255; i++)
+                {
+                    let option = document.createElement('option')
+                    option.value = i
+                    option.innerHTML = i
+                    if (colours[c] == 'red')
+                        hex = rgbToHex(i, 0, 0)
+                    if (colours[c] == 'green')
+                        hex = rgbToHex(0, i, 0)
+                    if (colours[c] == 'blue')
+                        hex = rgbToHex(0, 0, i)
+                    option.style.background = hex
+                    option.style.color = '#ffffff'
+                    select.appendChild(option)
+                }
+            }
+        }
+
+		/**
+		 * rgb to hex colour
+		 * Hex conversion functions from Stack Overflow.
+         * https://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+		 */
+        function componentToHex(c) {
+            var hex = c.toString(16)
+            return hex.length == 1 ? '0' + hex : hex
+        }
+
+        function rgbToHex(r, g, b) {
+            return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b)
+        }
+
+
+		/**
+		 * drawPalette
+		 * Draw a colour swatch.
+		 */
+		function drawPalette()
+		{
+            erasePalette()
+			const red = document.getElementById('red').value
+			const green = document.getElementById('green').value
+			const blue = document.getElementById('blue').value
+            const alpha = document.getElementById('alpha').value
+			const palette = document.getElementById('palette')
+            palette.style.fill = d3.rgb(red, green, blue, alpha)
+		}
+
+		/**
+		 * erasePalette
+		 * Clear all rectangles.
+		 */
+		function erasePalette()
+		{
+			d3.selectAll('palette').remove()
+		}
 	</script>
   </body>
 </html>
