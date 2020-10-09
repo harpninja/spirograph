@@ -4,21 +4,14 @@
  		<meta http-equiv='Content-Type' content='text/html;charset=utf-8'/>
 		<title>Spirograph</title>
 		<script src='https://d3js.org/d3.v4.min.js'></script>
-		<script src='http://cdnjs.cloudflare.com/ajax/libs/mathjs/3.14.2/math.min.js'></script>
+		<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.14.2/math.min.js'></script>
+		<link rel="stylesheet" href="../d3.css">
+    <link rel='stylesheet' type='text/css' href='https://fonts.googleapis.com/css?family=Open+Sans'>
 		<style>
-		body {
-			font-family: Verdana, sans-serif;
-			font-size: 8pt;
-			color: #555555;
-			background: #ffffff;
-			margin-left: 20px;
-			margin-top: 20px;
-		}
-
-		input {
-			font-family: Verdana, sans-serif;
-			font-size: 8pt;
-			color: #555555;
+		input, button {
+			font-family: 'Cormorant Garamond', sans-serif;
+			font-size: 1em;
+			color: #222222;
 		}
 
 		.spirograph {
@@ -32,12 +25,13 @@
 
 		fieldset {
 			border: 1px #333333 solid;
-			width: 800px;
+			width: 900px;
 		}
 		</style>
  	</head>
 
  	<body>
+	<h1>Spirograph</h1>
 	A mathematically precise spirograph generator.
   	<a href='https://github.com/harpninja/spirograph'>Code on GitHub</a>. <br>
 	Choose a ratio between (-1 to -0.1) or (0.1 to 1.0) for complete spirals.
